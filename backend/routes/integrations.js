@@ -16,15 +16,33 @@ const {
 const router = express.Router()
 
 // GET /meta/connect
-router.get('/meta/connect', authMiddleware, async (req, res) => {
+router.get('/meta/connect', async (req, res) => {
   try {
+    // Accept token from query param (for OAuth redirect flow) or Authorization header
+    let userId = null
+    const tokenFromQuery = req.query.token
+    const tokenFromHeader = req.headers.authorization?.split(' ')[1]
+    const token = tokenFromQuery || tokenFromHeader
+
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' })
+    }
+
+    try {
+      const jwt = require('jsonwebtoken')
+      const decoded = jwt.verify(token, process.env.JWT_SECRET)
+      userId = decoded.userId
+    } catch {
+      return res.status(401).json({ message: 'Invalid token' })
+    }
+
     const { platform } = req.query
     if (!VALID_PLATFORMS.includes(platform)) {
       return res.status(400).json({ message: 'Invalid platform. Must be one of: instagram, facebook, whatsapp' })
     }
 
     const state = crypto.randomBytes(32).toString('hex')
-    await OAuthState.create({ userId: req.userId, state, platform })
+    await OAuthState.create({ userId, state, platform })
 
     const url = buildOAuthUrl(platform, state)
     return res.redirect(url)

@@ -53,13 +53,15 @@ export default function Integrations() {
       .finally(() => setLoading(false))
   }, [location.search])
 
-  const handleToggle = (app) => {
+  const handleToggle = async (app) => {
     if (app.connected) {
       setConfirmApp(app)
     } else {
       const key = META_PLATFORM_KEY[app.name]
       if (key) {
-        const url = api.integrations.getConnectUrl(key)
+        const token = localStorage.getItem('af_token')
+        const baseUrl = 'https://autoflow-api.vercel.app/api'
+        const url = `${baseUrl}/integrations/meta/connect?platform=${key}&token=${token}`
         window.location.href = url
       } else {
         setApps(apps.map(a => a.id === app.id ? { ...a, connected: true } : a))
