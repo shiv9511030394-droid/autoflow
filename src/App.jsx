@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useState, Suspense, lazy } from 'react'
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react'
 
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const Login = lazy(() => import('./pages/auth/Login'))
@@ -54,40 +55,43 @@ function App() {
   }
 
   return (
-    <Router>
-      <Suspense fallback={<Loader />}>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={
-            isAuthenticated ? <Navigate to="/app" replace /> : <Login setAuth={login} />
-          } />
-          <Route path="/signup" element={
-            isAuthenticated ? <Navigate to="/app" replace /> : <Signup />
-          } />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/onboarding" element={<Onboarding />} />
+    <>
+      <Router>
+        <Suspense fallback={<Loader />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={
+              isAuthenticated ? <Navigate to="/app" replace /> : <Login setAuth={login} />
+            } />
+            <Route path="/signup" element={
+              isAuthenticated ? <Navigate to="/app" replace /> : <Signup />
+            } />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/onboarding" element={<Onboarding />} />
 
-          <Route path="/app" element={
-            isAuthenticated ? <DashboardLayout logout={logout} userProfile={userProfile} /> : <Navigate to="/login" replace />
-          }>
-            <Route index element={<Dashboard />} />
-            <Route path="automation" element={<AutomationBuilder />} />
-            <Route path="chat-flows" element={<ChatFlows />} />
-            <Route path="funnels" element={<Funnels />} />
-            <Route path="crm" element={<CRM />} />
-            <Route path="email" element={<EmailCampaigns />} />
-            <Route path="broadcasts" element={<Broadcasts />} />
-            <Route path="templates" element={<Templates />} />
-            <Route path="integrations" element={<Integrations />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="billing" element={<Billing />} />
-            <Route path="settings" element={<Settings updateProfile={updateProfile} userProfile={userProfile} />} />
-          </Route>
+            <Route path="/app" element={
+              isAuthenticated ? <DashboardLayout logout={logout} userProfile={userProfile} /> : <Navigate to="/login" replace />
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="automation" element={<AutomationBuilder />} />
+              <Route path="chat-flows" element={<ChatFlows />} />
+              <Route path="funnels" element={<Funnels />} />
+              <Route path="crm" element={<CRM />} />
+              <Route path="email" element={<EmailCampaigns />} />
+              <Route path="broadcasts" element={<Broadcasts />} />
+              <Route path="templates" element={<Templates />} />
+              <Route path="integrations" element={<Integrations />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="billing" element={<Billing />} />
+              <Route path="settings" element={<Settings updateProfile={updateProfile} userProfile={userProfile} />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </Router>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </Router>
+      <VercelAnalytics />
+    </>
   )
 }
 
