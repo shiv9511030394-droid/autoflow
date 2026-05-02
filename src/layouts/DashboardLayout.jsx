@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import Logo from '@/components/Logo'
+import Footer from '@/components/Footer'
 import AIAssistant from '@/components/AIAssistant'
 
 const menuItems = [
@@ -61,7 +62,7 @@ export default function DashboardLayout({ logout, userProfile = {} }) {
   }, [isMobile])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Top Navbar */}
       <nav className="fixed top-0 left-0 right-0 h-16 glass border-b border-white/10 z-40">
         <div className="h-full px-4 flex items-center justify-between">
@@ -150,7 +151,7 @@ export default function DashboardLayout({ logout, userProfile = {} }) {
 
       {/* Main Content */}
       <main
-        className={`pt-16 transition-all duration-300 ${
+        className={`flex-1 pt-16 transition-all duration-300 ${
           !isMobile && sidebarOpen ? 'md:pl-64' : !isMobile ? 'md:pl-16' : ''
         }`}
       >
@@ -158,6 +159,7 @@ export default function DashboardLayout({ logout, userProfile = {} }) {
           <Outlet />
         </div>
       </main>
+      <Footer />
       {/* Notifications Modal */}
       <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Notifications">
         <div className="space-y-3">

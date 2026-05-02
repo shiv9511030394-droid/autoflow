@@ -19,6 +19,8 @@ const Integrations = lazy(() => import('./pages/Integrations'))
 const Analytics = lazy(() => import('./pages/Analytics'))
 const Billing = lazy(() => import('./pages/Billing'))
 const Settings = lazy(() => import('./pages/Settings'))
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
+const Terms = lazy(() => import('./pages/Terms'))
 
 const Loader = () => (
   <div style={{ minHeight: '100vh', background: '#060d1a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
@@ -83,6 +85,9 @@ function App() {
             <Route path="billing" element={<Billing />} />
             <Route path="settings" element={<Settings updateProfile={updateProfile} userProfile={userProfile} />} />
           </Route>
+
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

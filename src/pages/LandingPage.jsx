@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
+import Footer from '@/components/Footer'
 import Logo from '@/components/Logo'
 import { currencies, formatPrice } from '@/lib/utils'
 
@@ -313,15 +314,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-12 px-4">
-        <div className="max-w-7xl mx-auto text-center text-gray-400">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Logo size="md" showTagline={false} />
-          </div>
-          <p>© 2026 Aotuflow. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -1,46 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, Github, Chrome, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Github, Chrome } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { api } from '@/lib/api'
 
 export default function Login({ setAuth }) {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [showPass, setShowPass] = useState(false)
 
-  useEffect(() => {
-    const canonical = document.querySelector("link[rel='canonical']")
-    if (canonical) canonical.remove()
-  }, [])
+  // Set canonical for this page
+  const canonical = document.querySelector("link[rel='canonical']")
+  if (canonical) canonical.remove()
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setError('')
-    setLoading(true)
-    try {
-      const data = await api.login(formData.email, formData.password)
-      localStorage.setItem('af_token', data.token)
-      localStorage.setItem('af_profile', JSON.stringify(data.user))
-      setAuth(true)
-      navigate('/app')
-    } catch (err) {
-      // Fallback: agar backend down ho toh bhi login karne do
-      if (err.message === 'Failed to fetch' || err.message.includes('JSON')) {
-        const profile = { email: formData.email, firstName: formData.email.split('@')[0] }
-        localStorage.setItem('af_auth', 'true')
-        localStorage.setItem('af_profile', JSON.stringify(profile))
-        setAuth(true)
-        navigate('/app')
-      } else {
-        setError(err.message)
-      }
-    } finally {
-      setLoading(false)
-    }
+    setAuth(true)
+    navigate('/app')
   }
 
   return (
@@ -79,18 +54,14 @@ export default function Login({ setAuth }) {
               <Input
                 id="login-password"
                 name="password"
-                type={showPass ? 'text' : 'password'}
+                type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="pl-10 pr-10"
+                className="pl-10"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
               />
-              <button type="button" onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
             </div>
           </div>
 
@@ -104,10 +75,7 @@ export default function Login({ setAuth }) {
             </Link>
           </div>
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Button>
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          <Button type="submit" className="w-full">Sign In</Button>
         </form>
 
         <div className="mt-6">
@@ -120,10 +88,10 @@ export default function Login({ setAuth }) {
             </div>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <Button variant="outline" className="flex items-center justify-center gap-2" onClick={() => alert('Google login coming soon!')}>
+            <Button variant="outline" className="flex items-center justify-center gap-2">
               <Chrome className="w-5 h-5" />Google
             </Button>
-            <Button variant="outline" className="flex items-center justify-center gap-2" onClick={() => alert('GitHub login coming soon!')}>
+            <Button variant="outline" className="flex items-center justify-center gap-2">
               <Github className="w-5 h-5" />GitHub
             </Button>
           </div>

@@ -10,9 +10,9 @@ export default defineConfig({
     },
   },
   test: {
+    environment: 'jsdom',
     globals: true,
-    environment: 'node',
-    include: ['src/tests/**/*.test.{js,jsx}'],
+    setupFiles: ['./src/tests/setup.js'],
   },
   build: {
     rollupOptions: {

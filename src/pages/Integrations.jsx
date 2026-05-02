@@ -1,23 +1,15 @@
-import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import { Instagram, Facebook, Youtube, MessageCircle, Mail, Webhook, Send } from 'lucide-react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
-import { api } from '../lib/api'
-
-const META_PLATFORM_KEY = {
-  Instagram: 'instagram',
-  Facebook: 'facebook',
-  WhatsApp: 'whatsapp',
-}
 
 const initialApps = [
-  { id: 1, name: 'Instagram', icon: Instagram, connected: false, bgColor: '#ec489920', textColor: '#f472b6', description: 'Auto-reply to comments and DMs' },
-  { id: 2, name: 'Facebook', icon: Facebook, connected: false, bgColor: '#3b82f620', textColor: '#60a5fa', description: 'Messenger automation' },
+  { id: 1, name: 'Instagram', icon: Instagram, connected: true, bgColor: '#ec489920', textColor: '#f472b6', description: 'Auto-reply to comments and DMs' },
+  { id: 2, name: 'Facebook', icon: Facebook, connected: true, bgColor: '#3b82f620', textColor: '#60a5fa', description: 'Messenger automation' },
   { id: 3, name: 'YouTube', icon: Youtube, connected: true, bgColor: '#ef444420', textColor: '#f87171', description: 'Comment automation' },
-  { id: 4, name: 'WhatsApp', icon: MessageCircle, connected: false, bgColor: '#10b98120', textColor: '#34d399', description: 'Business API integration' },
+  { id: 4, name: 'WhatsApp', icon: MessageCircle, connected: true, bgColor: '#10b98120', textColor: '#34d399', description: 'Business API integration' },
   { id: 5, name: 'SMTP', icon: Mail, connected: true, bgColor: '#8b5cf620', textColor: '#a78bfa', description: 'Email delivery service' },
   { id: 6, name: 'Webhooks', icon: Webhook, connected: false, bgColor: '#f59e0b20', textColor: '#fcd34d', description: 'Custom integrations' },
   { id: 7, name: 'Telegram', icon: Send, connected: false, bgColor: '#3b82f620', textColor: '#60a5fa', description: 'Bot automation' },
@@ -26,64 +18,18 @@ const initialApps = [
 export default function Integrations() {
   const [apps, setApps] = useState(initialApps)
   const [confirmApp, setConfirmApp] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const location = useLocation()
 
-  useEffect(() => {
-    // Handle ?success= and ?error= query params
-    const params = new URLSearchParams(location.search)
-    const success = params.get('success')
-    const error = params.get('error')
-    if (success) alert(`Successfully connected ${success}!`)
-    if (error) alert(`Connection failed: ${error}`)
-
-    // Fetch real status for Meta platforms
-    api.integrations.getStatus()
-      .then((status) => {
-        setApps(prev => prev.map(app => {
-          const key = META_PLATFORM_KEY[app.name]
-          if (!key) return app
-          const platformStatus = status[key]
-          return { ...app, connected: platformStatus?.status === 'connected' }
-        }))
-      })
-      .catch(() => {
-        // Keep default disconnected state on error
-      })
-      .finally(() => setLoading(false))
-  }, [location.search])
-
-  const handleToggle = async (app) => {
+  const handleToggle = (app) => {
     if (app.connected) {
-      setConfirmApp(app)
+      setConfirmApp(app) // ask confirmation before disconnect
     } else {
-      const key = META_PLATFORM_KEY[app.name]
-      if (key) {
-        const token = localStorage.getItem('af_token')
-        const baseUrl = 'https://autoflow-api.vercel.app/api'
-        const url = `${baseUrl}/integrations/meta/connect?platform=${key}&token=${token}`
-        window.location.href = url
-      } else {
-        setApps(apps.map(a => a.id === app.id ? { ...a, connected: true } : a))
-      }
+      setApps(apps.map(a => a.id === app.id ? { ...a, connected: true } : a))
     }
   }
 
-  const confirmDisconnect = async () => {
-    const app = confirmApp
-    const key = META_PLATFORM_KEY[app.name]
+  const confirmDisconnect = () => {
+    setApps(apps.map(a => a.id === confirmApp.id ? { ...a, connected: false } : a))
     setConfirmApp(null)
-
-    if (key) {
-      try {
-        await api.integrations.disconnect(key)
-        setApps(prev => prev.map(a => a.id === app.id ? { ...a, connected: false } : a))
-      } catch {
-        alert('Disconnect failed. Please try again.')
-      }
-    } else {
-      setApps(prev => prev.map(a => a.id === app.id ? { ...a, connected: false } : a))
-    }
   }
 
   return (
@@ -110,7 +56,6 @@ export default function Integrations() {
               variant={app.connected ? 'outline' : 'primary'}
               className="w-full"
               onClick={() => handleToggle(app)}
-              disabled={loading && !!META_PLATFORM_KEY[app.name]}
             >
               {app.connected ? 'Disconnect' : 'Connect'}
             </Button>
